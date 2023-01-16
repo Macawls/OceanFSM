@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OceanFSM
 {
-    public class StateMachine<T> where T : class, IStateMachineRunner<T>
+    public class StateMachine<T> where T : class
     {
         private State<T> _mCurrentState;
         private State<T> _mPreviousState;
@@ -20,13 +20,15 @@ namespace OceanFSM
         /// </summary>
         private readonly Dictionary<State<T>, List<StateTransition<T>>> _mTransitions;
         
-        public T Runner { get; private set; }
-        
+        /// <summary>
+        /// The runner instance of the state machine.
+        /// </summary>
+        public T Runner { get;  }
         
         /// <summary>
         /// The initial state of the state machine.
         /// </summary>
-        public State<T> StartingState { get; private set; }
+        public State<T> StartingState { get; }
         
         /// <summary>
         /// The current state of the state machine.

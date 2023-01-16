@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OceanFSM
 {
-    public class StateMachineBuilder<T>  where T : class, IStateMachineRunner<T>
+    public class StateMachineBuilder<T>  where T : class
     {
         private State<T> _mStartingState;
-        
         private readonly T _mRunner;
         private readonly Dictionary<State<T>, List<StateTransition<T>>> _mTransitions = new();
         
-        public StateMachineBuilder(IStateMachineRunner<T> runner)
+        public StateMachineBuilder(T stateRunner)
         {
-            _mRunner = runner.Runner;
+            _mRunner = stateRunner;
         }
         
         public StateMachineBuilder<T> SetStartingState(State<T> startingState)
@@ -27,10 +27,13 @@ namespace OceanFSM
             {
                 _mTransitions.Add(from, new List<StateTransition<T>>());
             }
+
+            var transition = onTransition == null ? 
+                new StateTransition<T>(from, to, condition) : 
+                new StateTransition<T>(from, to, condition, onTransition);
             
-            _mTransitions[from].Add(onTransition == null ? 
-                new StateTransition<T>(from, to, condition) :
-                new StateTransition<T>(from, to, condition, onTransition));
+            
+            _mTransitions[from].Add(transition);
             
             return this;
         }
@@ -52,8 +55,9 @@ namespace OceanFSM
             foreach (var state in _mTransitions.Keys)
             {
                 state.SetRunner(_mRunner);
+                state.OnInitialize(_mRunner);
             }
-            
+
             return new StateMachine<T>(_mRunner, _mStartingState, _mTransitions);
         }
     }
