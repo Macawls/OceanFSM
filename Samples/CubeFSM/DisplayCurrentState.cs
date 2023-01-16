@@ -9,7 +9,7 @@ namespace OceanFSM.CubeExample
     {
         [SerializeField] private TextMeshProUGUI tmpText;
 
-        public void OnStateChange(State<ICubeMachine> newState)
+        public void OnStateChange(State<ICube> newState)
         {
             if (!tmpText)
             {

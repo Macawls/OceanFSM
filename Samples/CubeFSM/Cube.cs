@@ -1,12 +1,11 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace OceanFSM.CubeExample
 {
-    public class Cube : MonoBehaviour, ICubeMachine
+    public class Cube : MonoBehaviour, ICube
     {
-        [SerializeField] private UnityEvent<State<ICubeMachine>> onStateChanged;
+        [SerializeField] private UnityEvent<State<ICube>> onStateChanged;
 
         [Header("Components")]
         [SerializeField] private MeshRenderer meshRenderer;
@@ -20,9 +19,10 @@ namespace OceanFSM.CubeExample
         [SerializeField] private KeyCode firstStateKey = KeyCode.UpArrow;
         [SerializeField] private KeyCode secondStateKey = KeyCode.DownArrow;
         
-        public ICubeMachine Runner => this;
-        private StateMachine<ICubeMachine> _mFsm;
-        
+        private StateMachine<ICube> _mFsm;
+
+        public int Sides => 6; // dummy value for example
+
         public void ChangeColor(Color newColor)
         {
             meshRenderer.material.color = newColor;
@@ -30,11 +30,11 @@ namespace OceanFSM.CubeExample
 
         private void Awake()
         {
-            var secondToFirst = new StateTransition<ICubeMachine>(secondCubeState, firstCubeState,
+            var secondToFirst = new StateTransition<ICube>(secondCubeState, firstCubeState,
                 condition: () => Input.GetKeyDown(firstStateKey), 
                 OnSecondToFirstTransition);
 
-            _mFsm = new StateMachineBuilder<ICubeMachine>(this)
+            _mFsm = new StateMachineBuilder<ICube>(this)
                 .SetStartingState(firstCubeState)
                 .AddTransition(firstCubeState, secondCubeState, 
                     condition: () => Input.GetKeyDown(secondStateKey))
@@ -45,9 +45,9 @@ namespace OceanFSM.CubeExample
             _mFsm.OnStateChanged += state => onStateChanged?.Invoke(state);
         }
 
-        private void OnSecondToFirstTransition(ICubeMachine cubeMachine)
+        private void OnSecondToFirstTransition(ICube cube)
         {
-            Debug.Log($"{cubeMachine.GetType().Name} says hello :).  " +
+            Debug.Log($"{cube.GetType().Name} says hello :).  " +
                       $"This comes from the concrete transition added to the machine");
         }
         

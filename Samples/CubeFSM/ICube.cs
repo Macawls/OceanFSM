@@ -2,8 +2,9 @@
 
 namespace OceanFSM.CubeExample
 {
-    public interface ICubeMachine : IStateMachineRunner<ICubeMachine>
+    public interface ICube
     {
+        int Sides { get; }
         void ChangeColor(Color newColor);
     }
 }
