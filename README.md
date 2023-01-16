@@ -93,6 +93,22 @@ public class Closed : State<IDoor>
 }
 ```
 
+To add functionality to a state, you can override the following methods.
+```csharp
+public virtual void OnEnter() { }
+public virtual void OnExit() { }
+public virtual void OnUpdate(float deltaTime) { }
+public virtual void OnFixedUpdate(float fixedDeltaTime) { }
+```
+If you're using inheritance with your states, you can call the base methods like so,
+```csharp
+public override void OnEnter()
+{
+    base.OnEnter();
+    Debug.Log("Entered a State");
+}
+```
+
 ## 3. Creating a Transition
 Transitions are created by calling the AddTransition method on the builder or creating a transition object.
 They require a predicate or condition to be met before the transition can occur.
