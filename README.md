@@ -111,8 +111,8 @@ The key methods are:
 ```csharp
 void Start();
 void Stop();
-void Update();
-void FixedUpdate();
+void Update(float deltaTime);
+void FixedUpdate(float fixedDeltaTime);
 void Evaluate();
 ```
 
