@@ -113,7 +113,7 @@ namespace OceanFSM
         
         private void OnTransitionEvaluate(StateTransition<T> stateTransition)
         {
-            if (!stateTransition.Condition())
+            if (stateTransition.Condition() == false)
             {
                 return;
             }
