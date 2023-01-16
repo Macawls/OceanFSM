@@ -31,4 +31,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_REGISTRY: 'https://npm.pkg.github.com/@Macawls'
         run: npx semantic-release
