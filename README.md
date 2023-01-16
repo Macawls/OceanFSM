@@ -25,7 +25,7 @@ There are three concepts to know:
 
 ## 1. Creating a State Machine
 The StateMachineBuilder is used to create a state machine. 
-It is a fluent API, meaning you can chain methods together to create a state machine.
+It uses the [builder pattern](https://refactoring.guru/design-patterns/builder)/has a fluent API, meaning you can chain methods together to create a state machine.
 
 ### Door Example
 ```csharp
@@ -48,39 +48,47 @@ private void Awake()
 }
 ```
 
-The constructor for the builder requires an object that implements the IStateMachineRunner interface.
-The state machine, states and transitions are bound by T so that states are tied to a specific type.
-
-```csharp
-public interface IStateMachineRunner<out T> where T : class
-{ 
-    T Runner { get; }
-}
-```
-
-So, in the example above, we create a monobehaviour like so,
-
+The constructor for the builder requires the type T runner.
+So, in the example above, we create a monobehaviour like so which implements IDoor.
 ```csharp
 public class Door : MonoBehaviour, IDoor
 {
-    public IDoor Runner => this;
+    void Open(){
+        // Open the door
+    }
+    
+    void Close(){
+       // Close the door
+    }
 }
 ```
-IDoor inherits from IStateMachineRunner, so we can pass it to the builder.
+Here, all the states will have access to instance which implements IDoor using the Runner property.
 ```csharp
-public interface IDoor : IStateMachineRunner<IDoor>
+public interface IDoor 
 {
     void Close();
     void Open();
 }
 ```
-This is ideal rather than passing the entire monobehaviour itself. 
+In my opinion this is ideal rather than passing the entire monobehaviour itself. 
 For example, you can have an interface like like IPlayer, ITrafficLight, ICheckpoint or whatever you want :D.
 
-All the states will have access to the instance the generic type T.
+You can however pass the monobehaviour itself if you wish.
+If that is the case, we change the generic type and it would look like this.
+```csharp
+private StateMachine<Door> _mFsm;
+
+private void Awake()
+{
+    _mFsm = new StateMachineBuilder<Door>(this).Build();
+}
+```
+
+
 
 ## 2. Creating a State
-All the methods in the builder require concrete states.
+All the methods in the builder require **concrete** states which can be done by inheriting from the State<T> class.
+
 What I personally like to do is serialize states by adding the serializable attribute to the class. They can then be held in scriptable objects or monobehaviours or whatever you like.
 ```csharp
 [Serializable]
@@ -95,12 +103,19 @@ public class Closed : State<IDoor>
 
 To add functionality to a state, you can override the following methods.
 ```csharp
+public virtual void OnInitialize(T runner) { }
 public virtual void OnEnter() { }
 public virtual void OnExit() { }
 public virtual void OnUpdate(float deltaTime) { }
 public virtual void OnFixedUpdate(float fixedDeltaTime) { }
 ```
-If you're using inheritance with your states, you can call the base methods like so,
+
+OnInitialize(T runner) is called when the state machine is built using the builder.
+It's useful for any initialization/setup you only need to once.
+
+### Inheritance
+
+If you're using inheritance with your states, you can call the base methods like so.
 ```csharp
 public override void OnEnter()
 {
@@ -109,11 +124,44 @@ public override void OnEnter()
 }
 ```
 
+For example, suppose we have a base class called PlayerStateBase where when we enter a new state, we'd like to play a specific animation.
+It would look something like this.
+```csharp
+[Serializable]
+public class PlayerStateBase : State<IPlayer>
+{
+    [SerializeField] private AnimationClip stateAnimation;
+    
+    public override void Enter()
+    {
+        Runner.PlayAnimation(stateAnimation);
+    }
+}
+```
+
+```csharp
+[Serializable]
+public class Jump : PlayerStateBase
+{
+    public override void Enter()
+    {
+        base.Enter();
+    }
+    
+    public override void OnUpdate(float deltaTime)
+    {
+        // jump logic
+    }
+}
+```
+
+
+
 ## 3. Creating a Transition
 Transitions are created by calling the AddTransition method on the builder or creating a transition object.
 They require a predicate or condition to be met before the transition can occur.
 ```csharp
-var closedToOpen = new Transition<IDoor>(from: closed, to: open, 
+var closedToOpen = new StateTransition<IDoor>(from: closed, to: open, 
     condition: () => {
     return PlayerIsNearby() && Input.GetKeyDown(KeyCode.Space) 
     && _mIsLocked == false)
@@ -137,6 +185,6 @@ Important to note that the state machine will not run until you call Start().
 I would recommend calling Evaluate() in late update or after all your other updates have been called.
 
 Evaluate() will continuously check all transitions of the current state.
-If any condition is met, the state machine will transition to the new state.
+If any condition is met, the state machine will transition to the new state set in the transition.
 
 
