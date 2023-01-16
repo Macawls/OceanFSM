@@ -12,7 +12,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Release
-      uses: cycjimmy/semantic-release-action@v2
+      uses: cycjimmy/semantic-release-action@v3
       with:
         extra_plugins: |
           @semantic-release/changelog
@@ -20,3 +20,4 @@ jobs:
         branch: main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
