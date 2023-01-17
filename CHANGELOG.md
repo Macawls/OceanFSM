@@ -1,3 +1,12 @@
+## [1.0.2](https://github.com/Macawls/OceanFSM/compare/v1.0.1...v1.0.2) (2023-01-17)
+
+
+### Documentation
+
+* **README:** add video ([ef2513e](https://github.com/Macawls/OceanFSM/commit/ef2513e3d0ce7293e8ca8506ceccac36de7039be))
+* **README:** flesh out example ([9b59740](https://github.com/Macawls/OceanFSM/commit/9b5974062d2c760aa74406f36ee3d280d45c79e2))
+* update documentation in src ([d33b4b9](https://github.com/Macawls/OceanFSM/commit/d33b4b9b051c82c6754a044e1678a18e161c74f1))
+
 ## [1.0.1](https://github.com/Macawls/OceanFSM/compare/v1.0.0...v1.0.1) (2023-01-17)
 
 
