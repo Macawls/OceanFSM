@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace OceanFSM
 {
+    /// <summary>
+    /// Used to build a state machine.
+    /// </summary>
+    /// <typeparam name="T">
+    /// A reference type used to associate/bind states and transitions with the state machine.
+    /// </typeparam>
     public class StateMachineBuilder<T>  where T : class
     {
         private State<T> _mStartingState;

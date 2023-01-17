@@ -3,13 +3,17 @@ using System.Collections.Generic;
 
 namespace OceanFSM
 {
+    /// <summary>
+    /// A state machine with a finite number of states.
+    /// </summary>
+    /// <typeparam name="T">
+    /// A reference type used to associate/bind states and transitions with the state machine.
+    /// </typeparam>
     public class StateMachine<T> where T : class
     {
         private State<T> _mCurrentState;
         private State<T> _mPreviousState;
-
-        public event Action<State<T>> OnStateChanged;
-
+        
         /// <summary>
         /// The current list of transitions belonging to the current state.
         /// </summary>
@@ -48,6 +52,10 @@ namespace OceanFSM
                 OnStateChanged?.Invoke(_mCurrentState);
             }
         }
+        /// <summary>
+        /// The event invoked when the state machine changes state.
+        /// </summary>
+        public event Action<State<T>> OnStateChanged;
         
         /// <summary>
         /// The previous state of the state machine.
@@ -83,7 +91,6 @@ namespace OceanFSM
         {
             CurrentState.OnExit();
             _mCurrentState = null;
-            _mPreviousState = null;
         }
         
         /// <summary>
