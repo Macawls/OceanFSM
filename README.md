@@ -198,12 +198,7 @@ public override void OnEnter()
 
 ### Player Example
 
-<p align="center">
-<video width="550" controls>
-  <source src="https://i.imgur.com/8dZdluw.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-</p>
+https://user-images.githubusercontent.com/80009513/212888509-3f0e4358-f7f9-4acc-9f89-594ea925bd11.mp4
 
 For a simple example, suppose we have a base class called PlayerStateBase where when we enter a new state, we'd like to play a specific animation.
 It would look something like this.
