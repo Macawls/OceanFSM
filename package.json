@@ -1,6 +1,6 @@
 {
     "name": "com.macawls.oceanfsm",
-    "version": "0.8.1-preview",
+    "version": "1.0.1",
     "displayName": "Ocean FSM",
     "description": "A code-only, simple and easy to use Finite State Machine for your Unity Projects",
     "unity": "2019.1",
@@ -10,9 +10,11 @@
         "email": "josh@macawls.dev",
         "url": "https://macawls.dev/"
     },
-    "samples": [{
-        "displayName": "Cube FSM",
-        "description": "A simple cube",
-        "path": "Samples/CubeFSM"
-    }]
+    "samples": [
+        {
+            "displayName": "Cube FSM",
+            "description": "A simple cube",
+            "path": "Samples/CubeFSM"
+        }
+    ]
 }

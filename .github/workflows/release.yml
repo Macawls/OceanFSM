@@ -1,22 +1,35 @@
-name: CI
+name: Release
 on:
   push:
     branches:
-    - main
+      - main
 jobs:
   release:
-    name: release
+    name: Release
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Release
-      uses: cycjimmy/semantic-release-action@v2
-      with:
-        extra_plugins: |
-          @semantic-release/changelog
-          @semantic-release/git
-        branch: main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+      - name: Install dependencies
+        run: >  
+          npm install --save false
+          semantic-release 
+          @semantic-release/changelog 
+          @semantic-release/commit-analyzer 
+          @semantic-release/git 
+          @semantic-release/github 
+          @semantic-release/npm 
+          @semantic-release/release-notes-generator 
+          conventional-changelog-conventionalcommits
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_REGISTRY: 'https://npm.pkg.github.com/@Macawls'
+        run: npx semantic-release
