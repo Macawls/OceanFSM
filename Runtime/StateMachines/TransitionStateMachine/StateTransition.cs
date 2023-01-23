@@ -3,10 +3,10 @@
 namespace OceanFSM
 {
     /// <summary>
-    /// Represents a trasition between two states.
+    /// Represents a transition between two states.
     /// </summary>
     /// <typeparam name="T">
-    /// A reference type used to associate/bind states and transitions with the state machine.
+    /// A reference type used to associate states and machines with a specific instance of a class.
     /// </typeparam>
     public class StateTransition<T> where T : class
     {
