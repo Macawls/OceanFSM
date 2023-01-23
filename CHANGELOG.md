@@ -1,3 +1,27 @@
+## [1.1.0](https://github.com/Macawls/OceanFSM/compare/v1.0.2...v1.1.0) (2023-01-23)
+
+
+### Features
+
+* Add Autonomous Builder ([44bd825](https://github.com/Macawls/OceanFSM/commit/44bd825c5c7f627f3799d6a53598b21ed27450d2))
+* Add Autonomous State Machine ([17d11cf](https://github.com/Macawls/OceanFSM/commit/17d11cf148384ee5cb24cd69be0987a30dc586a4))
+* Add IStateMachine marker interface and components ([730c916](https://github.com/Macawls/OceanFSM/commit/730c916195a6e7aa577b43d875f8a6de1181037d))
+* Add Machine property to state, remove T runner param ([9772129](https://github.com/Macawls/OceanFSM/commit/9772129ab510389070306c95219809b9cac43471))
+* Add State Machine Base ([45d1a95](https://github.com/Macawls/OceanFSM/commit/45d1a957bdf54007543a2d8531b233d4d2b92c28))
+* add Transitional Builder ([8f22476](https://github.com/Macawls/OceanFSM/commit/8f22476a939c1e5df60b872ff41748f5aec92ced))
+* Add Transitional State Machine ([9789348](https://github.com/Macawls/OceanFSM/commit/9789348afc46b649884d9530f9629030ba486f1c))
+
+
+### Bug Fixes
+
+* add PlayerFSM Sample to package.json ([c53e846](https://github.com/Macawls/OceanFSM/commit/c53e846f01a11789be8fc6581917c3f5cfb3c68d))
+
+
+### Documentation
+
+* **README:** update documentation 😌👍 ([0c41540](https://github.com/Macawls/OceanFSM/commit/0c41540e06dc71481a4c18b20cddca0404db6054))
+* update xml ([be4c6de](https://github.com/Macawls/OceanFSM/commit/be4c6dea8171d097a31f8c23fa5e108c6fbca63d))
+
 ## [1.0.2](https://github.com/Macawls/OceanFSM/compare/v1.0.1...v1.0.2) (2023-01-17)
 
 
