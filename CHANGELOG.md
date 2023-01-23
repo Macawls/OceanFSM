@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/Macawls/OceanFSM/compare/v1.1.0...v1.1.1) (2023-01-23)
+
+
+### Bug Fixes
+
+* remove empty using ([#8](https://github.com/Macawls/OceanFSM/issues/8)) ([9ac4ae3](https://github.com/Macawls/OceanFSM/commit/9ac4ae373ad6b853e3312a93a86c98fbf1334db6))
+
 ## [1.1.0](https://github.com/Macawls/OceanFSM/compare/v1.0.2...v1.1.0) (2023-01-23)
 
 
