@@ -253,7 +253,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 499884069}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &269864700
 MonoBehaviour:
@@ -284,11 +284,11 @@ MonoBehaviour:
         m_CallState: 2
   meshRenderer: {fileID: 269864697}
   firstCubeState:
-    color: {r: 0.8980392, g: 0.872591, b: 0.3843137, a: 1}
+    color: {r: 1, g: 0.97079074, b: 0.3622641, a: 1}
   secondCubeState:
     color: {r: 0.38039216, g: 0.6862745, b: 0.9372549, a: 1}
-  firstStateKey: 273
-  secondStateKey: 274
+  firstStateInput: 273
+  secondStateInput: 274
 --- !u!1 &441024284
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,7 +475,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1231783447}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1231783446
 GameObject:
@@ -606,7 +606,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1231783447}
-  m_RootOrder: -1
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1341546216
 GameObject:
@@ -639,7 +639,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1483598088}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -821,7 +821,6 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
-  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -839,7 +838,7 @@ RectTransform:
   m_Children:
   - {fileID: 1341546217}
   m_Father: {fileID: 31130241}
-  m_RootOrder: -1
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -941,7 +940,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 31130241}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 40, y: -45, z: 0}
 --- !u!1 &1516886058
 GameObject:
@@ -1004,6 +1003,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -1039,7 +1039,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 31130241}
-  m_RootOrder: -1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1948501185
 GameObject:

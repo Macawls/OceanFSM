@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace OceanFSM.CubeExample
 {
@@ -15,13 +16,11 @@ namespace OceanFSM.CubeExample
         [SerializeField] private SecondCubeState secondCubeState;
 
 
-        [Header("Keycodes for changing state")] 
-        [SerializeField] private KeyCode firstStateKey = KeyCode.UpArrow;
-        [SerializeField] private KeyCode secondStateKey = KeyCode.DownArrow;
-        
-        private StateMachine<ICube> _mFsm;
+        [Header("Controls for changing state")] 
+        [SerializeField] private KeyCode firstStateInput;
+        [SerializeField] private KeyCode secondStateInput;
 
-        public int Sides => 6; // dummy value for example
+        private ITransitionalStateMachine<ICube> _mFsm;
 
         public void ChangeColor(Color newColor)
         {
@@ -30,20 +29,17 @@ namespace OceanFSM.CubeExample
 
         private void Awake()
         {
-            var secondToFirst = new StateTransition<ICube>(secondCubeState, firstCubeState,
-                condition: () => Input.GetKeyDown(firstStateKey), 
-                OnSecondToFirstTransition);
-
-            _mFsm = new StateMachineBuilder<ICube>(this)
+            _mFsm = new TransitionalStateMachineBuilder<ICube>(this)
                 .SetStartingState(firstCubeState)
-                .AddTransition(firstCubeState, secondCubeState, 
-                    condition: () => Input.GetKeyDown(secondStateKey))
-                .AddTransition(secondToFirst)
+                .AddTransition(firstCubeState, secondCubeState, SecondStateInput, 
+                    cube => Debug.Log("Transitioned to second state")) // optional callback
+                .AddTransition(secondCubeState, firstCubeState, FirstStateInput)
                 .Build();
-
-
-            _mFsm.OnStateChanged += state => onStateChanged?.Invoke(state);
         }
+
+        private bool SecondStateInput() => Input.GetKeyDown(secondStateInput);
+
+        private bool FirstStateInput() => Input.GetKeyDown(firstStateInput);
 
         private void OnSecondToFirstTransition(ICube cube)
         {
