@@ -17,19 +17,18 @@
 </a>
 </p>
 
+https://user-images.githubusercontent.com/80009513/212888509-3f0e4358-f7f9-4acc-9f89-594ea925bd11.mp4
+
 ## Documentation
 
 There is no full documentation yet!
 More samples are on the way!
 
 ## Adding to your project
-
 ### OpenUPM
-
 ```bash
 openupm add com.macawls.oceanfsm
 ```
-
 ### Git URL
 
 1. Open the package manager window
@@ -41,27 +40,29 @@ https://github.com/Macawls/OceanFsm.git
 ```
 
 ### Manual
-
 Add the following to your manifest.json.
+Remember to replace the version with the lastest one if you so wish.
 
-```json
+```json5
 {
   "scopedRegistries": [
     {
       "name": "OpenUPM",
       "url": "https://package.openupm.com",
-      "scopes": ["com.macawls.oceanfsm"]
+      "scopes": [
+        "com.macawls.oceanfsm"
+      ]
     }
   ],
-  "dependencies": {
-    "com.macawls.oceanfsm": "1.0.0"
+  "dependencies": { 
+    "com.macawls.oceanfsm": "1.0.0" // Replace with the latest version
   }
 }
 ```
 
 ## Samples
-
-After adding the package, you can use the import button within the package manager window to have a look around the examples.
+After adding the package, you can use the import button to import the samples.
+The samples were created from the default 3D Unity template.
 
 ## Getting Started
 
@@ -71,22 +72,25 @@ There are three concepts to know:
 2. States
 3. Transitions
 
-## 1. Creating a State Machine
+[State Pattern on Refactoring Guru](https://refactoring.guru/design-patterns/state)
 
-The StateMachineBuilder is used to create a state machine.
-It uses the [builder pattern](https://refactoring.guru/design-patterns/builder)/has a fluent API, meaning you can chain methods together to create a state machine.
+## State Machine Types
 
-### Door Example
+There are two types of state machines at the moment:
+- ```Autonomous``` - States themselves are responsible for transitioning to other states.
+- ```Transitional``` - States are changed by transitions with conditionals. States are not responsible for transitioning.
 
+There are two builders to aid in creating state machines, they are not required to construct them.
+### Transitional State Machine
 ```csharp
-private StateMachine<IDoor> _mFsm;
+private ITransitionalStateMachine<IDoor> _mFsm;
 
 private void Awake()
 {
     var closed = new Closed();
     var open = new Open();
 
-    _mFsm = new StateMachineBuilder<IDoor>(this)
+    _mFsm = new TransitionStateMachineBuilder<IDoor>(this)
         .SetStartingState(closed)
         .AddTransition(from: closed, to: open,
             condition: () => {
@@ -96,14 +100,47 @@ private void Awake()
         .AddTransition(from: open, to: closed,
             condition: () => {
             return PlayerIsNearby() && Input.GetKeyDown(KeyCode.Space)
+        }, onTransition: () => {
+            Debug.Log("Closing the door"); // action is optional
         })
         .Build();
 }
 ```
 
-The constructor for the builder requires a reference type. In this case, we're passing in the instance that implements IDoor.
+### Autonomous State Machine
+```csharp
+private IAutonomousStateMachine<IPlayer> _mFsm;
 
-So, in the example above, we create a monobehaviour like so which implements IDoor.
+private void Awake()
+{
+    _mFsm = new AutonomousStateMachineBuilder<IDoor>(this)
+        .SetStartingState(new Idle())
+        .AddState(new Walk())
+        .AddState(new Jump())
+        .Build();
+}
+```
+
+### Which one should I use?
+I've found that if it's a simple entity with a finite amount of states that won't be extended, the ```Transitional``` state machine is the way to go.
+For example a door, checkpoint, traffic light, treasure chest etc.
+
+
+If it's an entity that is fairly complex and will be extended, the ```Autonomous``` state machine is the way to go.
+Something like a player, enemy, NPC etc. 
+
+It all depends, there's nothing stopping you from using either one. It's very flexible.
+What you could do is, if you're unsure as to how many states you require, initially use the ```Autonomous``` state machine and keep extending it. 
+At some point you may find that you're not extending it anymore and you can extract your conditionals to use a ```Transitional``` state machine.
+<hr> 
+
+## 2. Creating a State
+All states have to inherit from the ```State<T>``` class.
+
+### Generic Usage
+The generic reference type is used to associate your states and state machines.
+You can use whatever you want, but I recommend using an interface to keep things tidy.
+Lets define ```IDoor``` as our reference type.
 
 ```csharp
 public interface IDoor
@@ -111,101 +148,75 @@ public interface IDoor
     void Close();
     void Open();
 }
-
-public class Door : MonoBehaviour, IDoor
+```
+```csharp
+public class Door : MonoBehaviour, IDoor 
 {
-    void Close()
-    {
-        // logic
-    }
-
-    void Open()
-    {
-        // logic
-    }
-}
+    private ITransitionalStateMachine<IDoor> _mFsm;
+    
+    // Instance of IDoor passed to constructor of the builder 
+    _mFsm = new TransitionalStateMachineBuilder(this) 
+    ...
+ }
 ```
 
-Here, all the states will have access to instance which implements IDoor using the Runner property. Like so.
+Here, all the states will have access to instance which implements ```IDoor``` using the ```Runner``` property. Like so.
 
 ```csharp
 class Closed : State<IDoor>
 {
-    public override void Enter()
+    public override void OnEnter() => Runner.Close();
+}
+```
+
+States also have a ```Machine``` property. This will be null if a ```Transitional``` state machine is used.
+The example below is from an ```Autonomous``` state machine.
+```csharp
+class Closed : State<IDoor>
+{
+    public override void OnUpdate()
     {
-        Runner.Close();
+        if (PlayerIsNearby() && Input.GetKeyDown(unlockKey))
+        {
+            Machine.ChangeState<Open>(() => {
+                Debug.Log("Player has opened the door");
+            });
+        }
     }
 }
 ```
-
-In my opinion this is ideal rather than passing the entire monobehaviour itself.
-For example, you can have an interface like like IPlayer, ITrafficLight, ICheckpoint or whatever you want :D.
-
-You can however pass the monobehaviour itself if you wish, which is useful for coroutines or whatever Unity specific stuff you need.
-
-If that is the case, we change the generic type and it would look something like this.
-
-```csharp
-private StateMachine<Door> _mFsm;
-
-private void Awake()
-{
-    _mFsm = new StateMachineBuilder<Door>(this).Build();
-}
-```
-
-## 2. Creating a State
-
-All the methods in the builder require **concrete** states which can be done by inheriting from the State<T> class.
-
-What I personally like to do is serialize states by adding the serializable attribute to the class. They can then be held in scriptable objects or monobehaviours or whatever you like which is useful for configuration.
-
-```csharp
-[Serializable]
-public class Closed : State<IDoor>
-{
-    public override void Enter()
-    {
-        Runner.Close();
-    }
-}
-```
+### Functionality
 
 To add functionality to a state, you can override the following methods.
 
 ```csharp
-public virtual void OnInitialize(T runner) { }
-public virtual void OnEnter() { }
-public virtual void OnExit() { }
-public virtual void OnUpdate(float deltaTime) { }
-public virtual void OnFixedUpdate(float fixedDeltaTime) { }
+virtual void OnInitialize() { }
+virtual void OnEnter() { }
+virtual void OnExit() { }
+virtual void OnUpdate(float deltaTime) { }
+virtual void OnFixedUpdate(float fixedDeltaTime) { }
 ```
 
-OnInitialize(T runner) is called when the state machine is built using the builder.
-It's useful for any initialization/setup you only need to once.
-
-### Inheritance
-
-If you're using inheritance with your states, you can call the base methods like so.
+### Configuration
+What I personally like to do is serialize states by adding the ```serializable``` attribute to the class. They can then be held in scriptable objects or monobehaviours or whatever you like which is useful for configuration.
 
 ```csharp
-public override void OnEnter()
+[Serializable]
+public class RunState : State<IPlayer>
 {
-    base.OnEnter();
-    Debug.Log("Entered a State");
+    // bunch of serialized fields, 
+    // move speed, acceleration, etc. 
 }
 ```
 
-### Player Example
 
-https://user-images.githubusercontent.com/80009513/212888509-3f0e4358-f7f9-4acc-9f89-594ea925bd11.mp4
-
-For a simple example, suppose we have a base class called PlayerStateBase where when we enter a new state, we'd like to play a specific animation.
+### Inheritance Example
+For a simple use case for inheritance, suppose we have a base class called PlayerStateBase where when we enter a new state, we'd like to play a specific animation.
 It would look something like this.
 
 ```csharp
 [Serializable]
-public class PlayerStateBase : State<IPlayer>
+public abstract class PlayerStateBase : State<IPlayer>
 {
     [SerializeField] private AnimationClip stateAnimation;
 
@@ -221,54 +232,13 @@ public class PlayerStateBase : State<IPlayer>
 public class Jump : PlayerStateBase
 {
     // whatever fields you need
-    [SerializeField] private float jumpForce;
-
+    
     public override void Enter()
     {
-        base.Enter();
+        base.Enter(); // play the animation
+        // other logic
     }
 }
-// etc...
-```
-
-An alternative way to accomplish this is to use listen on the onStateChanged event, like so
-
-```csharp
-private void Awake()
-{
-    _mFsm = new StateMachineBuilder<IPlayer>(this)
-        .SetStartingState(new Idle())
-        .Build();
-}
-
-private void OnEnable() => _mFsm.onStateChanged += PlayStateAnimation;
-private void OnDisable() => _mFsm.onStateChanged -= PlayStateAnimation;
-
-private void PlayStateAnimation(State<IPlayer> newState)
-{
-    // suppose we have an interface called IAnimatable,
-    // which has an animation field.
-    // Really just a rough example, first method is better.
-    if (newState is IAnimatable state)
-    {
-        PlayAnimation(state.animation);
-    }
-}
-```
-
-## 3. Creating a Transition
-
-Transitions are created by calling the AddTransition method on the builder or creating a transition object.
-They require a predicate or condition to be met before the transition can occur.
-
-The from and to parameters require a concrete state, the state machine does not hold any states internally, only transitions.
-
-```csharp
-var closedToOpen = new StateTransition<IDoor>(from: closed, to: open,
-    condition: () => {
-    return PlayerIsNearby() && Input.GetKeyDown(KeyCode.Space)
-    && _mIsLocked == false)
-});
 ```
 
 ## 4. Running the State Machine
@@ -281,12 +251,42 @@ void Start();
 void Stop();
 void Update(float deltaTime);
 void FixedUpdate(float fixedDeltaTime);
-void Evaluate();
+void Evaluate(); // only for Transitional state machines
 ```
 
 Important to note that the state machine will not run until you call Start().
 
 I would recommend calling **Evaluate() in [Late Update](https://docs.unity3d.com/ScriptReference/MonoBehaviour.LateUpdate.html)** or after all your other updates have been called.
 
-Evaluate() will continuously check all transitions of the current state.
-If any condition is met, the state machine will transition to the new state set in the transition.
+Evaluate() will continuously check all transitions of the current state. If a transition is met, it will change to the new state.
+
+### Using Monobehaviour Hooks
+```csharp
+private void OnEnable()
+{
+    _mFsm.Start();
+}
+
+private void OnDisable()
+{
+    _mFsm.Stop();
+}
+
+private void Update()
+{
+    _mFsm.Update(Time.deltaTime);
+}
+
+private void FixedUpdate()
+{
+    _mFsm.FixedUpdate(Time.fixedDeltaTime);
+}
+
+private void LateUpdate() // if using Transitional
+{
+    _mFsm.Evaluate();
+}
+```
+
+
+
