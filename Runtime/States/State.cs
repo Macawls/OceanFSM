@@ -11,12 +11,21 @@
         /// <summary>
         /// The instance used to run the state machine.
         /// </summary>
-        protected T Runner { get; private set; }
-        internal void SetRunner(T runner)
+        public T Runner { get; private set; }
+
+        /// <summary>
+        /// The machine associated with this state. Will be null if the state machine does not implement <see cref="IAutonomousStateMachine{T}"/>.
+        /// </summary>
+        public IAutonomousStateMachine<T> Machine { get; private set; }
+        
+        internal void InitializeInternal(T runner, IStateMachine<T> machine)
         {
             Runner = runner;
+            Machine = machine as IAutonomousStateMachine<T>;
+            OnInitialize();
         }
-        public virtual void OnInitialize(T runner) { }
+
+        public virtual void OnInitialize() { }
         public virtual void OnEnter() { }
         public virtual void OnExit() { }
         public virtual void OnUpdate(float deltaTime) { }
