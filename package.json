@@ -12,14 +12,17 @@
     },
     "samples": [
         {
-            "displayName": "Cube FSM",
-            "description": "A simple cube",
-            "path": "Samples/CubeFSM"
-        },
-        {
-            "displayName": "Player FSM",
-            "description": "A simple player state machine",
+            "displayName": "Door and Player FSM",
+            "description": "A door and player fsm that interact with each other",
             "path": "Samples/PlayerFSM"
         }
-    ]
+    ],
+    "devDependencies": {
+        "cz-conventional-changelog": "^3.3.0"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    }
 }
