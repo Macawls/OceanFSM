@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/Macawls/OceanFSM/compare/v1.2.0...v1.2.1) (2023-02-13)
+
+
+### Documentation
+
+* **README:** docs update 😎👍 ([cf7d493](https://github.com/Macawls/OceanFSM/commit/cf7d4936857a42a72edfd6f3617fafea077de095))
+
 ## [1.2.0](https://github.com/Macawls/OceanFSM/compare/v1.1.1...v1.2.0) (2023-02-13)
 
 
