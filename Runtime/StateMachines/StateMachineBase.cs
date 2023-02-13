@@ -9,9 +9,9 @@ namespace OceanFSM
         protected State<T> PreviousStateInternal;
         
         public T Runner { get; }
-        public State<T> StartingState { get; }
-        
-        public event Action<State<T>> OnStateChanged;
+        public string InitialStateID { get; protected set; }
+
+        public event Action<State<T>> StateChanged;
         
         public State<T> PreviousState => PreviousStateInternal;
         
@@ -26,34 +26,26 @@ namespace OceanFSM
                 CurrentStateInternal = value;
 
                 CurrentStateInternal.OnEnter();
-                OnStateChanged?.Invoke(CurrentStateInternal);
+                StateChanged?.Invoke(CurrentStateInternal);
             }
         }
 
-        protected StateMachineBase(T runner, State<T> startingState)
+        protected StateMachineBase(T runner, string initialStateID)
         {
+            InitialStateID = initialStateID;
             Runner = runner;
-            StartingState = startingState;
         }
         
         protected void InvokeOnStateChanged(State<T> newState)
         {
-            OnStateChanged?.Invoke(newState);
+            StateChanged?.Invoke(newState);
         }
         
-        public virtual void Start()
-        {
-            CurrentState = StartingState;
-        }
-
-        public virtual void Start(State<T> startingState)
-        {
-            CurrentState = startingState;
-        }
-
+        public abstract void Start();
+        
         public virtual void Stop()
         {
-            CurrentState.OnExit();
+            CurrentState?.OnExit();
             CurrentStateInternal = null;
         }
 
@@ -61,10 +53,30 @@ namespace OceanFSM
         {
             CurrentState?.OnUpdate(deltaTime);
         }
-
-        public virtual void FixedUpdate(float fixeDeltaTime)
+        
+        protected static bool MatchesID(State<T> state, string stateID)
         {
-            CurrentState?.OnFixedUpdate(fixeDeltaTime);
+            return state.GetType().Name == stateID;
         }
+        
+        protected void HandleCommandExecution(ITransitionCommand command, State<T> targetState)
+        {
+            if (command.Predicate == null)
+            {
+                CurrentState = targetState;
+                command.OnSuccess?.Invoke();
+                return;
+            }
+
+            if (!command.Predicate())
+            {
+                command.OnFailure?.Invoke();
+                return;
+            }
+            
+            CurrentState = targetState;
+            command.OnSuccess?.Invoke();
+        }
+        
     }
 }

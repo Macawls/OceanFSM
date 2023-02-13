@@ -6,7 +6,7 @@
     /// <typeparam name="T"></typeparam>
     public interface IStateMachine<T> : 
         IStateMachineContext<T>, 
-        IStateMachineController<T> where T : class
+        IStateMachineController where T : class
     {
         
     }
