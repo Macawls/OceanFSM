@@ -1,3 +1,23 @@
+## [1.2.0](https://github.com/Macawls/OceanFSM/compare/v1.1.1...v1.2.0) (2023-02-13)
+
+
+### Features
+
+* add state generator tool ([8a0e681](https://github.com/Macawls/OceanFSM/commit/8a0e68147f0e1446035aee5d4028247ff96587dd))
+* add transition commands ([641e631](https://github.com/Macawls/OceanFSM/commit/641e631742e1b9bb048e85675042f14c8cd54975))
+* add transition for polling machine ([212eca0](https://github.com/Macawls/OceanFSM/commit/212eca084b6e68ca353e95adcfd978a305f8aaa8))
+* update functionality, refactor transitional into polling machine ([2ec3ab6](https://github.com/Macawls/OceanFSM/commit/2ec3ab613eec6ff6c9858df13a0bee322798d935))
+
+
+### Refactors
+
+* make fields protected, remove fixedUpdate() ([ff3f187](https://github.com/Macawls/OceanFSM/commit/ff3f18779139fd48633a8766d84184e5df8600a8))
+
+
+### Documentation
+
+* **README:** update docs 😎👍 ([5b1cd40](https://github.com/Macawls/OceanFSM/commit/5b1cd4005a1828905619918ca8cbdf17f81c9a4a))
+
 ## [1.1.1](https://github.com/Macawls/OceanFSM/compare/v1.1.0...v1.1.1) (2023-01-23)
 
 
