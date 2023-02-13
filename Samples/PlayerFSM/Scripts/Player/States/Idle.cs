@@ -12,11 +12,7 @@ namespace OceanFSM.PlayerExample
             
             if (Runner.MovementInput.y > 0.1f)
             {
-                // or Machine.ChangeState("Run");
-                Machine.ChangeState<Run>(() => 
-                {
-                    Debug.Log("Transitioned to Run State");
-                }); 
+                Machine.ChangeState<Run>();
             }
         }
     }

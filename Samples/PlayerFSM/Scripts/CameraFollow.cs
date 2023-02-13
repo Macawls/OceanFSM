@@ -1,31 +1,24 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-public class CameraFollow : MonoBehaviour
+namespace OceanFSM.PlayerExample
 {
-    [SerializeField] private Transform target;
-    [SerializeField] private float smoothSpeed = 0.125f;
-    [SerializeField] private Vector3 offset;
-    
-    private Vector3 _mPosition;
-    private Vector3 _mDesiredPosition;
-    
-    private void FixedUpdate()
+    [RequireComponent(typeof(Camera))]
+    public class CameraFollow : MonoBehaviour
     {
-       _mDesiredPosition = target.position + offset;
-    }
+        [SerializeField] public Transform targetTransform;
+        [SerializeField] private float distance = 4;
+        [SerializeField] private float height = 1.5f;
+        [SerializeField] private float smoothTime = 0.25f;
+       
+        private Vector3 _mCurrentVelocity;
 
-    private void Update()
-    {
-        GetSmoothedPosition(_mDesiredPosition, out _mPosition);
-    }
-
-    private void GetSmoothedPosition(in Vector3 desiredPosition, out Vector3 smoothedPosition)
-    {
-        smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-    }
-
-    private void LateUpdate()
-    {
-        transform.position = _mPosition;
+        private void LateUpdate()
+        {
+            var direction = targetTransform.transform.forward * -1;
+            var target = targetTransform.position + new Vector3(0, height, 0) + direction * distance;
+            
+            transform.position = Vector3.SmoothDamp(transform.position, target, ref _mCurrentVelocity, smoothTime);
+            transform.LookAt(targetTransform);
+        }
     }
 }

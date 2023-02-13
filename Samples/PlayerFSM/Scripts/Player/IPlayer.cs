@@ -6,5 +6,6 @@ namespace OceanFSM.PlayerExample
     {
         Animator Animator { get; }
         CharacterController CharacterController { get; }
+        bool IsGrounded { get; }
     }
 }

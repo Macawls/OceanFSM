@@ -26,12 +26,9 @@ namespace OceanFSM.PlayerExample
             
             Runner.CharacterController.SimpleMove(forward * curSpeed);
             
-            if (Runner.MovementInput is {x: 0, y: 0})
+            if (Runner.MovementInput is { x: 0, y: 0 })
             {
-                Machine.ChangeState<Idle>(() =>
-                {
-                    Debug.Log("Transitioned to Idle State");
-                });
+                Machine.ChangeState<Idle>();
             }
         }
     }
