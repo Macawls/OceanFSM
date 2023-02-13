@@ -21,29 +21,28 @@ https://user-images.githubusercontent.com/80009513/212888509-3f0e4358-f7f9-4acc-
 
 ## Documentation
 
-There is no full documentation yet!
-More samples are on the way!
+There is no full documentation yet! However, there are samples and a getting started section below.
 
 ## Adding to your project
-### OpenUPM
+### OpenUPM (Recommended)
 ```bash
 openupm add com.macawls.oceanfsm
 ```
-### Git URL
+### Git URL (Recommended)
 
 1. Open the package manager window
-2. Click the plus sign and choose "Add package from git URL"
-3. Use the link below.
+2. Click the plus icon
+3. Choose ``"Add package from git URL..."``
+4. Use the link below.
 
 ```
 https://github.com/Macawls/OceanFsm.git
 ```
 
-### Manual
+### Manual (Not Recommended)
 Add the following to your manifest.json.
-Remember to replace the version with the lastest one if you so wish.
 
-```json5
+```yml
 {
   "scopedRegistries": [
     {
@@ -55,14 +54,16 @@ Remember to replace the version with the lastest one if you so wish.
     }
   ],
   "dependencies": { 
-    "com.macawls.oceanfsm": "1.0.0" // Replace with the latest version
+    // Replace with the latest version of the package
+    "com.macawls.oceanfsm": "{version}" 
   }
 }
 ```
 
 ## Samples
-After adding the package, you can use the import button to import the samples.
-The samples were created from the default 3D Unity template.
+After adding the package, you can use the **import** button from the package manager window to inspect the samples.
+
+The samples were created from the Default 3D Unity template.
 
 ## Getting Started
 
@@ -77,31 +78,37 @@ There are three concepts to know:
 ## State Machine Types
 
 There are two types of state machines at the moment:
-- ```Autonomous``` - States themselves are responsible for transitioning to other states.
-- ```Transitional``` - States are changed by transitions with conditionals. States are not responsible for transitioning.
 
-There are two builders to aid in creating state machines, they are not required to construct them.
+### Autonomous State Machine
+- States are responsible for transitioning to other states.
+- The machine can receive commands to transition to a specific state.
+- Can freely transition to any state.
+
+### Polling State Machine
+- The machine holds an internal dictionary of states and their transitions.
+- Transitions are triggered by a condition/predicate.
+- States cannot transition by themselves.
+
+## Creating the State Machine
+There are two builders to aid in creating state machines.
 ### Transitional State Machine
 ```csharp
-private ITransitionalStateMachine<IDoor> _mFsm;
+private IPollingMachine<IDoor> _mFsm;
 
 private void Awake()
 {
     var closed = new Closed();
     var open = new Open();
 
-    _mFsm = new TransitionStateMachineBuilder<IDoor>(this)
-        .SetStartingState(closed)
-        .AddTransition(from: closed, to: open,
-            condition: () => {
-            return PlayerIsNearby() && Input.GetKeyDown(KeyCode.Space)
-            && _mIsLocked == false)
+    _mFsm = new PollingBuilder<IDoor>(this)
+        .SetStartingState(nameof(Closed))
+        .AddTransition(closed, open, () => {
+            return PlayerIsNearby && Input.GetKeyDown(KeyCode.Space) && !_mIsLocked)
         })
-        .AddTransition(from: open, to: closed,
-            condition: () => {
+        .AddTransition(open, closed, () => {
             return PlayerIsNearby() && Input.GetKeyDown(KeyCode.Space)
         }, onTransition: () => {
-            Debug.Log("Closing the door"); // action is optional
+            Debug.Log("Closing the door"); // optional
         })
         .Build();
 }
@@ -113,26 +120,91 @@ private IAutonomousStateMachine<IPlayer> _mFsm;
 
 private void Awake()
 {
-    _mFsm = new AutonomousStateMachineBuilder<IDoor>(this)
-        .SetStartingState(new Idle())
+    _mFsm = new AutonomousBuilder<IDoor>(this)
+        .SetStartingState(nameof(Idle))
+        .AddState(new Idle())
         .AddState(new Walk())
         .AddState(new Jump())
         .Build();
 }
 ```
 
+### Command Usage (WIP)
+Currently, only the ```AutonomousStateMachine``` supports commands.
+Commands are useful for triggering actions or responding to events from outside the state machine. Conditions and the actions are optional.
+
+```csharp
+private void Awake()
+{
+    _mFsm = new AutonomousBuilder<IPlayer>(this)
+        .SetInitialState(nameof(Idle)) 
+        .AddStates(idle, run, jump)
+        .Build();
+    
+    _mFsm.AddCommand("Jump")
+        .SetTargetState<Jump>()
+        .SetCondition(() => _mFsm.CurrentState is Run && IsGrounded)
+        .OnSuccess(() => Debug.Log("Hi mom")) // visual fx for example
+        .OnFailure(() => Debug.Log("depression")); // negative sound effect for example
+}
+
+private void OnJump(InputAction.CallbackContext ctx)
+{
+    if (ctx.performed)
+    {
+        _mFsm.ExecuteCommand("Jump");
+    }
+}
+```
+
+### Running the State Machine
+It is completely up to you how you want to run the state machine.
+The key methods are:
+
+```csharp
+void Start();
+void Stop();
+void Update(float deltaTime);
+void Evaluate(); // only for Polling State machines
+```
+
+Important to note that the state machine will not run until you call ```Start()```
+
+if you're using the ```Polling``` state machine, I would recommend calling ```Evaluate()``` in [Late Update](https://docs.unity3d.com/ScriptReference/MonoBehaviour.LateUpdate.html).
+
+```Evaluate()``` will continuously check all transitions of the current state. If a transition is met, it will change to the new state.
+
+### Using Monobehaviour Hooks
+```csharp
+private void OnEnable()
+{
+    _mFsm.Start();
+}
+
+private void OnDisable()
+{
+    _mFsm.Stop();
+}
+
+private void Update()
+{
+    _mFsm.Update(Time.deltaTime);
+}
+
+private void LateUpdate()
+{
+    _mFsm.Evaluate();
+}
+```
+
 ### Which one should I use?
-I've found that if it's a simple entity with a finite amount of states that won't be extended, the ```Transitional``` state machine is the way to go.
+I've found that if it's a simple entity with a few states and transitions, the ```Polling``` state machine is good.
 For example a door, checkpoint, traffic light, treasure chest etc.
 
+If it's an entity that is fairly complex and or reacts to external input , the ```Autonomous``` state machine is the way to go.
+Something like a player, enemy, NPC, UI system etc.
 
-If it's an entity that is fairly complex and will be extended, the ```Autonomous``` state machine is the way to go.
-Something like a player, enemy, NPC etc. 
-
-It all depends, there's nothing stopping you from using either one. It's very flexible.
-What you could do is, if you're unsure as to how many states you require, initially use the ```Autonomous``` state machine and keep extending it. 
-At some point you may find that you're not extending it anymore and you can extract your conditionals to use a ```Transitional``` state machine.
-<hr> 
+The ```Autonomous``` one is easier to use and more flexible. Most of the time I recommend using it.
 
 ## 2. Creating a State
 All states have to inherit from the ```State<T>``` class.
@@ -152,10 +224,10 @@ public interface IDoor
 ```csharp
 public class Door : MonoBehaviour, IDoor 
 {
-    private ITransitionalStateMachine<IDoor> _mFsm;
+    private IPollingMachine<IDoor> _mFsm;
     
     // Instance of IDoor passed to constructor of the builder 
-    _mFsm = new TransitionalStateMachineBuilder(this) 
+    _mFsm = new PollingBuilder<IDoor>(this) 
     ...
  }
 ```
@@ -169,8 +241,7 @@ class Closed : State<IDoor>
 }
 ```
 
-States also have a ```Machine``` property. This will be null if a ```Transitional``` state machine is used.
-The example below is from an ```Autonomous``` state machine.
+States also have a ```Machine``` property. If the machine is not castable to ```IAutonomousStateMachine<T>```, it will be null.
 ```csharp
 class Closed : State<IDoor>
 {
@@ -185,6 +256,7 @@ class Closed : State<IDoor>
     }
 }
 ```
+
 ### Functionality
 
 To add functionality to a state, you can override the following methods.
@@ -194,21 +266,20 @@ virtual void OnInitialize() { }
 virtual void OnEnter() { }
 virtual void OnExit() { }
 virtual void OnUpdate(float deltaTime) { }
-virtual void OnFixedUpdate(float fixedDeltaTime) { }
 ```
 
+```OnInitialize()``` is called when the state machine is built and the state has been added.
+
 ### Configuration
-What I personally like to do is serialize states by adding the ```serializable``` attribute to the class. They can then be held in scriptable objects or monobehaviours or whatever you like which is useful for configuration.
+What I personally like to do is serialize states by adding the ```Serializable``` attribute to the class. They can then be held in scriptable objects or monobehaviours or whatever you like which is useful for configuration.
 
 ```csharp
 [Serializable]
 public class RunState : State<IPlayer>
 {
-    // bunch of serialized fields, 
-    // move speed, acceleration, etc. 
+    // bunch of serialized fields, properties, etc.
 }
 ```
-
 
 ### Inheritance Example
 For a simple use case for inheritance, suppose we have a base class called PlayerStateBase where when we enter a new state, we'd like to play a specific animation.
@@ -241,52 +312,18 @@ public class Jump : PlayerStateBase
 }
 ```
 
-## 4. Running the State Machine
 
-It is completely up to you how you want to run the state machine.
-The key methods are:
 
-```csharp
-void Start();
-void Stop();
-void Update(float deltaTime);
-void FixedUpdate(float fixedDeltaTime);
-void Evaluate(); // only for Transitional state machines
-```
+### Utilities
+Since all states have to inherit from ```State<T>``` class, you can use the ```State Generator``` tool to generate a state boilerplate class for you. 
 
-Important to note that the state machine will not run until you call Start().
+You'll find it under the ```Tools``` dropdown menu.
 
-I would recommend calling **Evaluate() in [Late Update](https://docs.unity3d.com/ScriptReference/MonoBehaviour.LateUpdate.html)** or after all your other updates have been called.
+<center>
 
-Evaluate() will continuously check all transitions of the current state. If a transition is met, it will change to the new state.
+![](https://i.imgur.com/SVG6GjB.jpg)
 
-### Using Monobehaviour Hooks
-```csharp
-private void OnEnable()
-{
-    _mFsm.Start();
-}
 
-private void OnDisable()
-{
-    _mFsm.Stop();
-}
-
-private void Update()
-{
-    _mFsm.Update(Time.deltaTime);
-}
-
-private void FixedUpdate()
-{
-    _mFsm.FixedUpdate(Time.fixedDeltaTime);
-}
-
-private void LateUpdate() // if using Transitional
-{
-    _mFsm.Evaluate();
-}
-```
-
+</center>
 
 
