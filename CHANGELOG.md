@@ -1,3 +1,9 @@
+## [1.2.2](https://github.com/Macawls/OceanFSM/compare/v1.2.1...v1.2.2) (2024-06-14)
+
+### Bug Fixes
+
+* **ci:** Update release.yml ([529a9ca](https://github.com/Macawls/OceanFSM/commit/529a9ca0a2ef9dda66fc57a46335fbcf2d71f311))
+
 ## [1.2.1](https://github.com/Macawls/OceanFSM/compare/v1.2.0...v1.2.1) (2023-02-13)
 
 
